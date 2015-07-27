@@ -5,4 +5,7 @@
   Quantity: <%= @expenditure.quantity %><br>
 </p>
 
+<%= link_to 'edit', edit_expenditure_path %>
+<%= link_to 'delete', expenditure_path, method: :delete %>
+
 <%= link_to 'back', expenditures_path %>
