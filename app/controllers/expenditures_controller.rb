@@ -1,21 +1,17 @@
 class ExpendituresController < ApplicationController
-  before_action :authenticate_user, only: [:new, :create]
+  before_action :authenticate_user!, except: [:index, :show]
 
   def index
     @expenditures = Expenditure.all.order(purchase_date: :desc)
   end
 
   def new
-    if user_signed_in?
       @expenditure = Expenditure.new
-    else
-      redirect_to new_user_session_path
-      flash.notice = "sign in first please"
-    end
   end
 
   def create
     @expenditure = current_user.expenditures.build expenditure_params
+    
     if @expenditure.save
       redirect_to @expenditure
     else
@@ -29,20 +25,17 @@ class ExpendituresController < ApplicationController
 
   def edit
     @expenditure = Expenditure.find params[:id]
-    if @expenditure.user == current_user
-      render 'edit'
-    else
-      redirect_to expenditures_path
-      flash.alert = "Invalid Permissions"
-    end
+    verify_expenditure_owner
   end
 
   def update
     @expenditure = Expenditure.find params[:id]
+    verify_expenditure_owner
+
     if @expenditure.update expenditure_params
-      redirect_to @expenditure
+      redirect_to expenditure_path(@expenditure)
     else
-      render 'edit'
+      render :edit
     end
   end
 
@@ -65,7 +58,7 @@ class ExpendituresController < ApplicationController
         redirect_to expenditures_path
       end
     end
-    
+
     def expenditure_params
       params.require(:expenditure).permit(:name, :price, :quantity, :purchase_date)
     end
