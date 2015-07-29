@@ -3,9 +3,12 @@
   Date: <%= @expenditure.purchase_date.to_date %><br>
   Price: R<%= @expenditure.price %><br>
   Quantity: <%= @expenditure.quantity %><br>
+  Created by: <%= @expenditure.user.email %>
 </p>
 
-<%= link_to 'edit', edit_expenditure_path %>
-<%= link_to 'delete', expenditure_path, method: :delete %>
+<% if can_edit_expenditure?(@expenditure) %>
+	<%= link_to 'edit', edit_expenditure_path %>
+	<%= link_to 'delete', expenditure_path, method: :delete %>
+<% end %>
 
 <%= link_to 'back', expenditures_path %>

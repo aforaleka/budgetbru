@@ -1,4 +1,5 @@
 class ExpendituresController < ApplicationController
+  before_action :authenticate_user, only: [:new, :create]
 
   def index
     @expenditures = Expenditure.all.order(purchase_date: :desc)
@@ -52,12 +53,19 @@ class ExpendituresController < ApplicationController
       redirect_to expenditures_path
       flash.notice = "successfully deleted"
     else
-      redirect_to expenditures_path
+      redirect_to expenditure_path
       flash.alert = "Invalid Permissions"
     end
   end
 
   private
+
+    def verify_expenditure_owner
+      if @expenditure.user != current_user
+        redirect_to expenditures_path
+      end
+    end
+    
     def expenditure_params
       params.require(:expenditure).permit(:name, :price, :quantity, :purchase_date)
     end
